@@ -5,51 +5,50 @@ module ParamsFor
     module Glue
       extend ActiveSupport::Concern
 
-      module ClassMethods
-        # Define params for and before_action all in the same method
-        #
-        # @param name [Symbol] camelcased validator class name
-        # @param options [Hash] optional
-        # @option options [Boolean] :class class of the validator
-        # @option options [Array] any option that before_action takes
-        def params_for(name, options = {})
-          method_name = "#{name}_params"
-          define_method(method_name) do
-            return params_for(name, options)
-          end
-          return if options[:before_action] == false
-          send(:before_action, method_name.to_sym, options)
-        end
+      def validator_for(validator)
+        validator_name = "ParamsFor::#{validator.to_s.classify}"
+        validator_klass = validator_name.constantize
+        validator_klass.new(params)
       end
 
-      private
+      def validate_params(validator)
+        validator = validator_for(validator)
 
-      # Strong params checker
-      #
-      # @param name [Symbol] camelcased validator class name
-      # @param options [Hash] optional
-      # @option options [Boolean] :class class of the validator
-      # @return [Hash]
-      def params_for(name, options = {})
-        instance_var_name = "@#{name.to_s}_params"
-        instance_var = instance_variable_get(instance_var_name)
-        return instance_var if instance_var.present?
-
-        if options[:class]
-          validator_klass = options[:class]
+        if validator.valid?
+          @params_valid = true
         else
-          validator_name = "ParamsFor::#{name.to_s.classify}"
-          validator_klass = validator_name.constantize
+          @params_errors = validator.errors
+          @params_valid = false
         end
-
-        validator = validator_klass.new(params)
-
-        unless validator.valid?
-          render status: :bad_request, json: validator.errors.to_json and return false
-        end
-
-        instance_variable_set(instance_var_name, validator.to_params)
       end
+
+      def params_valid?(validator)
+        validate_params(validator) if @params_valid.nil?
+        @params_valid
+      end
+
+      def resources_valid?(*resources)
+        !!(resources.map(&:valid?).include?(false)) #possibly optimize this by exiting as soon as theres a false
+      end
+
+      def all_valid?(validator, *resources)
+        params_valid  = params_valid?(validator)
+        resources_valid = resources_valid? resources
+        #need to make sure both methods are called and nothing exists early
+        params_valid && resources_valid
+      end
+
+      def collect_errors(validator, *errorable)
+        errorable.map(&:valid?) #must validate everything to compile the list of errors
+        errors = errorable.collect(&:errors)
+        errors << @params_errors if !params_valid? validator
+        errors.map(&:to_hash).reduce{|accumulator, e| merge_hashes_of_arrays(accumulator, e)}
+      end
+
+      def merge_hashes_of_arrays(a,b)
+        a.merge(b){ |k, old_value, new_value| (old_value | new_value) }
+      end
+
     end
   end
 end
