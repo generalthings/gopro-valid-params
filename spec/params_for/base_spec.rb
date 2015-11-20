@@ -5,96 +5,56 @@ describe ParamsFor::Base do
   let(:validator_klass) do
     unless defined?(DummyValidator)
       class DummyValidator < ParamsFor::Base
-        attr_accessor :id, :name, :type
 
-        validates :type, inclusion: { in: %w{task project}, allow_nil: true }
+        validates :type, inclusion: {in: %w{task project}, allow_nil: true}
       end
     end
     DummyValidator
   end
-  let(:validator) do
-    validator_klass.new(id: 'asd', name: 3, new_param: 'ads')
-  end
 
-  describe 'attr_accessor' do
-    it 'assigns every attribute accessor to a attributes variable' do
-      expect(validator_klass.attributes).to eql([:id, :name, :type])
+  context 'initialization' do
+    let(:validator) do
+      validator_klass.new(id: 'asd', name: 3, new_param: 'ads')
     end
-  end
-  describe 'initialize' do
-    it 'assigns the given param to the attribute if exists' do
-      expect(validator.id).to eql('asd')
-    end
-    it 'not assigns the given param to the attribute if not exists' do
-      expect { validator.new_param }.to raise_error
-    end
-  end
-  describe 'to_params' do
-    it 'returns a hash with indifferent access' do
-      expect(validator.to_params.class).to eql(HashWithIndifferentAccess)
-    end
-    it 'uses attributes_hash to create the hash' do
-      expect(HashWithIndifferentAccess).to receive(:new).with(validator.send(:attributes_hash))
 
-      validator.to_params
+    it 'has getters for params' do
+      expect(validator.id).to eq('asd')
+      expect(validator.name).to eql(3)
+      expect(validator.new_param).to eq('ads')
+    end
+
+    it "returns nil for params that it doesn't have" do
+      expect(validator.non_existent).to be(nil)
     end
   end
 
-  describe 'attributes_hash' do
-    let(:validator_klass_with_modified_accessor) do
-      unless defined?(NewDummyValidator)
-        class NewDummyValidator < ParamsFor::Base
-          attr_accessor :id, :name
-
-          def id
-            'foo'
-          end
-        end
-      end
-      NewDummyValidator
-    end
-    let(:validator_with_modified_accessor) do
-      validator_klass_with_modified_accessor.new(
-        id: 'asd',
-        name: 3,
-        new_param: 'ads'
-      )
+  context 'handling validation errors' do
+    let(:validator) do
+      validator_klass.new type: 'job'
     end
 
-    let(:validator_with_only_one_attribute_set) do
-      validator_klass_with_modified_accessor.new(
-        name: 3,
-        param_to_ignore: 'ads'
-      )
+    it 'is not valid if theres a bad attribute' do
+      expect(validator.valid?).to be(false)
     end
 
-    it 'is protected' do
-      expect { validator.attributes_hash }.to raise_error
+    it 'contains appropriate errors' do
+      validator.valid?
+      expect(validator.errors).to include(:type)
     end
-    it 'returns a hash' do
-      expect(validator.send(:attributes_hash).class).to eql(Hash)
-    end
-    it 'contains every attribute' do
-      [:id, :name].each do |attribute|
-        expect(validator.send(:attributes_hash)).to include(attribute)
-      end
+  end
+
+  context 'class is valid' do
+    let(:validator) do
+      validator_klass.new type: 'task'
     end
 
-    it 'contains attributes set to nil if the nil is explicit' do
-      validator.id = nil
-      expect(validator.send(:attributes_hash)).to include(:id)
+    it 'should be valid' do
+      expect(validator.valid?).to be(true)
     end
 
-    it 'uses accessors to get the attributes' do
-      expect(validator_with_modified_accessor.send(:attributes_hash)[:id]).to eql('foo')
-    end
-
-    it 'return only the attributes explicitly set' do
-      expect(validator_with_only_one_attribute_set.send(:attributes_hash).keys).to eq([:name])
-    end
-
-    it 'is valid with no type given' do
-      expect(validator).to be_valid
+    it 'should not have errors' do
+      validator.valid?
+      expect(validator.errors.count).to be 0
     end
   end
 end
