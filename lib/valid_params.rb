@@ -3,10 +3,6 @@ require 'active_model'
 require 'valid_params/version'
 
 module ValidParams
-
   autoload :Base,  'valid_params/base'
-
-  module Connectors
-    autoload :Glue,  'valid_params/connectors/glue'
-  end
+  autoload :Connector, 'valid_params/connector'
 end

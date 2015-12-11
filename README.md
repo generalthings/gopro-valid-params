@@ -27,7 +27,7 @@ In your controller:
 # app/controllers/fancy_controller.rb
 
 class FancyController < ApplicationController
-  include ValidParams::Connectors::Glue
+  include ValidParams::Connector
 
   valid_params :fancy, only: [:create]
 
@@ -48,7 +48,7 @@ Or you can play with it yourself
 # app/controllers/fancy_controller.rb
 
 class FancyController < ApplicationController
-  include ValidParams::Connectors::Glue
+  include ValidParams::Connector
 
   # Creates a Fancy object by checking and validating params
   # before that

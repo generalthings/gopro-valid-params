@@ -6,6 +6,6 @@ class DummyController < ActionController::Base
     validates :id, presence: true
   end
 
-  include ValidParams::Connectors::Glue
+  include ValidParams::Connector
 
 end
