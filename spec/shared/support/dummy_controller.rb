@@ -1,11 +1,11 @@
 require 'action_controller'
-require 'params_for'
+require 'valid_params'
 
 class DummyController < ActionController::Base
-  class ParamsFor::Dummy < ParamsFor::Base
+  class ValidParams::Dummy < ValidParams::Base
     validates :id, presence: true
   end
 
-  include ParamsFor::Connectors::Glue
+  include ValidParams::Connectors::Glue
 
 end

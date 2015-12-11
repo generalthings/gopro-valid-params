@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-describe ParamsFor::Base do
+describe ValidParams::Base do
 
   let(:validator_klass) do
     unless defined?(DummyValidator)
-      class DummyValidator < ParamsFor::Base
+      class DummyValidator < ValidParams::Base
 
         validates :type, inclusion: {in: %w{task project}, allow_nil: true}
       end

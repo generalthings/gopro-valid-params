@@ -1,7 +1,4 @@
-[![Build
-Status](https://travis-ci.org/andresbravog/params_for.svg)](https://travis-ci.org/andresbravog/params_for) [![Code Climate](https://codeclimate.com/github/andresbravog/params_for/badges/gpa.svg)](https://codeclimate.com/github/andresbravog/params_for) [![Test Coverage](https://codeclimate.com/github/andresbravog/params_for/badges/coverage.svg)](https://codeclimate.com/github/andresbravog/params_for) [![Inline docs](http://inch-ci.org/github/andresbravog/params_for.svg?branch=master)](http://inch-ci.org/github/andresbravog/params_for)
-
-# ParamsFor
+# ValidParams
 
 Use service objects and the power of `ActiveModel::Validations` to easy validate params in controller.
 
@@ -10,7 +7,7 @@ Use service objects and the power of `ActiveModel::Validations` to easy validate
 Add this line to your application's `Gemfile`:
 
 ```ruby
-gem 'params_for'
+gem 'valid_params'
 ```
 
 And then execute:
@@ -19,7 +16,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install params_for
+    $ gem install valid_params
 
 ## Usage
 
@@ -30,9 +27,9 @@ In your controller:
 # app/controllers/fancy_controller.rb
 
 class FancyController < ApplicationController
-  include ParamsFor::Connectors::Glue
+  include ValidParams::Connectors::Glue
 
-  params_for :fancy, only: [:create]
+  valid_params :fancy, only: [:create]
 
   # Creates a Fancy object by checking and validating params
   # before that
@@ -51,7 +48,7 @@ Or you can play with it yourself
 # app/controllers/fancy_controller.rb
 
 class FancyController < ApplicationController
-  include ParamsFor::Connectors::Glue
+  include ValidParams::Connectors::Glue
 
   # Creates a Fancy object by checking and validating params
   # before that
@@ -64,22 +61,22 @@ class FancyController < ApplicationController
 
   protected
 
-  # Strong params delegated to ParamsFor::Fancy
+  # Strong params delegated to ValidParams::Fancy
   # and memoized in @fancy_params var returned by this method
   #
   # @return [HashwithIndifferentAccess]
   def fancy_params
-    params_for :fancy
+    valid_params :fancy
   end
 end
 ```
 
-Some place in your application ( suggested `app/validators/params_for/` )
+Some place in your application ( suggested `app/validators/valid_params/` )
 
 ```Ruby
-  # app/validators/params_for/fancy.rb
+  # app/validators/valid_params/fancy.rb
 
-  class ParamsFor::Fancy < ParamsFor::Base
+  class ValidParams::Fancy < ValidParams::Base
     attr_accessor :user_id, :fancy_name, :fancy_description
 
     validates :user_id, :fancy_name, presence: true
@@ -89,7 +86,7 @@ Some place in your application ( suggested `app/validators/params_for/` )
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/params_for/fork )
+1. Fork it ( https://github.com/[my-github-username]/valid_params/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)

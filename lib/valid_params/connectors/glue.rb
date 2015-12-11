@@ -1,6 +1,6 @@
 require 'active_support/concern'
 
-module ParamsFor
+module ValidParams
   module Connectors
     module Glue
 
@@ -42,7 +42,7 @@ module ParamsFor
       end
 
       def validator_for(validator)
-        validator_name = "ParamsFor::#{validator.to_s.classify}"
+        validator_name = "ValidParams::#{validator.to_s.classify}"
         validator_klass = validator_name.constantize
         validator_klass.new(params)
       end
