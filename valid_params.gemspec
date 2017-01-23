@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["paul.hieromnimon@gmail.com", "phieromnimon@gopro.com", "andresbravog@gmail.com"]
   spec.summary       = %q{Params Validatior for controllers using active_model validations.}
   spec.description   = %q{With Params validator oyu should be able to perform controller params validation easy and with any kind of type, format, or custom validation you already know and use in oyur models. }
-  spec.homepage      = "https://github.com/generalthings/gopro-valid-params"
+  spec.homepage      = "https://github.com/gopro/gopro-valid-params"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
